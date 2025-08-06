@@ -1,8 +1,6 @@
 import json
 import requests
 
-import requests
-
 def get_species_images(species_key, image_limit=3):
     print("Getting ... " + str(species_key))
     url = "https://api.gbif.org/v1/occurrence/search"
