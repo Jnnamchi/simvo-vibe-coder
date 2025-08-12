@@ -175,7 +175,7 @@
       <h1 id="main-title" class="title">Species Catalogue</h1>
       <p class="subtitle">Find info about any species!</p>
 
-      <form class="input-wrap" action="#" method="get" role="search">
+      <form class="input-wrap" action="#" method="get" role="search" onsubmit="return sayHi()">
         <span class="icon-left">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="7"></circle>
@@ -196,5 +196,12 @@
       <p class="note">Tip: Try “Panthera leo”, “Monarch butterfly”, or “Ginkgo biloba”.</p>
     </section>
   </main>
+  <script>
+    function sayHi() {
+      alert("Hi");
+      console.log("Log from the console runs!")
+      return false; // prevents form submission
+    }
+  </script>
 </body>
 </html>
