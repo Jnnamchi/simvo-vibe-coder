@@ -189,7 +189,6 @@
           name="q"
           placeholder="Search by common name or scientific name..."
         />
-        <span class="kbd-right">Enter</span>
         <button type="submit" hidden>Search</button>
       </form>
 
@@ -197,9 +196,18 @@
     </section>
   </main>
   <script>
-    function sayHi() {
-      alert("Hi");
-      console.log("Log from the console runs!")
+    async function sayHi() {
+      const query = document.querySelector(".search-input").value.trim();
+      if (!query) return false;
+      console.log("Getting data...")
+      try {
+        const res = await fetch(`http://localhost:8000/species?search=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        console.log(data);
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+
       return false; // prevents form submission
     }
   </script>
