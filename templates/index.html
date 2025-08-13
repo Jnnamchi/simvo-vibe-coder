@@ -17,7 +17,8 @@
       --accent2: #ff6f91; /* pink */
       --accent3: #6dd5ed; /* light blue */
       --card: rgba(255,255,255,0.7);
-      --card-border: rgba(255,255,255,0.4);
+      --card-strong: rgba(255,255,255,0.85);
+      --card-border: rgba(255,255,255,0.5);
       --text: #374151;
       --muted: #6b7280;
       --input-bg: rgba(255,255,255,0.8);
@@ -34,12 +35,12 @@
       font-family: 'Inter', sans-serif;
       color: var(--text);
       background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 40%, #f6d365 70%, #fda085 100%);
-      overflow: hidden;
+      overflow: auto; /* allow page scrolling to see all results */
     }
 
     /* Floating pastel blobs */
     .orb {
-      position: absolute;
+      position: fixed;
       width: 55vmax;
       height: 55vmax;
       filter: blur(70px);
@@ -48,6 +49,7 @@
       mix-blend-mode: screen;
       transform: translate(-50%, -50%);
       animation: float 18s ease-in-out infinite;
+      z-index: 0;
     }
     .orb:nth-child(1) {
       top: 20%;
@@ -74,10 +76,11 @@
 
     .wrap {
       position: relative;
-      height: 100%;
+      min-height: 100%;
       display: grid;
       place-items: center;
       padding: 24px;
+      z-index: 1;
     }
 
     .card {
@@ -103,7 +106,7 @@
     }
 
     .subtitle {
-      margin: 0 0 28px;
+      margin: 0 0 16px;
       font-size: clamp(14px, 2.2vw, 18px);
       color: var(--muted);
     }
@@ -126,9 +129,7 @@
       outline: none;
       transition: box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
     }
-    .search-input::placeholder {
-      color: var(--muted);
-    }
+    .search-input::placeholder { color: var(--muted); }
     .search-input:focus {
       border-color: var(--input-focus);
       box-shadow: 0 0 0 4px rgba(255,183,77,0.25);
@@ -141,10 +142,9 @@
       height: 56px;
       display: grid;
       place-items: center;
-      pointer-events: none;
       color: var(--muted);
     }
-    .icon-left { left: 14px; }
+    .icon-left { left: 14px; pointer-events: none; }
     .kbd-right {
       right: 14px;
       font-size: 12px;
@@ -152,10 +152,11 @@
       background: rgba(255,255,255,0.6);
       padding: 4px 8px;
       border-radius: 8px;
+      pointer-events: none;
     }
 
     .note {
-      margin-top: 16px;
+      margin-top: 10px;
       font-size: 12px;
       color: var(--muted);
     }
@@ -163,6 +164,106 @@
     @media (prefers-reduced-motion: reduce) {
       .orb { animation: none; }
     }
+
+    /* Results layout */
+    .results-wrap {
+      width: min(1200px, 92vw);
+      margin: 18px auto 60px;
+      z-index: 1;
+      position: relative;
+    }
+    #results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    /* Themed panel */
+    .panel {
+      border-radius: 16px;
+      background: var(--card-strong);
+      backdrop-filter: blur(10px) saturate(140%);
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
+      padding: 12px;
+      font-size: 12px;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+    .panel:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px rgba(0,0,0,0.18);
+      border-color: rgba(255,255,255,0.8);
+    }
+    .panel h4 {
+      margin: 0 0 6px 0;
+      font-size: 14px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent2), var(--accent1));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1.2;
+    }
+    .kv { margin: 2px 0; color: var(--text); }
+    .kv .label { color: var(--muted); }
+
+    /* Carousel */
+    .carousel { position: relative; margin-top: 8px; border-radius: 10px; overflow: hidden; }
+    .carousel img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      display: block;
+    }
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .nav-btn:hover { background: rgba(0,0,0,0.6); }
+    .nav-btn.prev { left: 6px; }
+    .nav-btn.next { right: 6px; }
+    .counter {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+    }
+
+    /* Loading row (in flow, reserves space) */
+    .loading {
+      display: flex;                 /* always take up space */
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      visibility: hidden;            /* hidden by default, space preserved */
+    }
+    .loading.show { visibility: visible; }
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-top-color: #ff9671;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -175,7 +276,8 @@
       <h1 id="main-title" class="title">Species Catalogue</h1>
       <p class="subtitle">Find info about any species!</p>
 
-      <form class="input-wrap" action="#" method="get" role="search" onsubmit="return sayHi()">
+      <!-- Prevent default in JS (do not rely on return value of async fn) -->
+      <form class="input-wrap" action="#" method="get" role="search" onsubmit="runSearch(event)">
         <span class="icon-left">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="7"></circle>
@@ -188,27 +290,127 @@
           type="text"
           name="q"
           placeholder="Search by common name or scientific name..."
+          aria-label="Search species"
         />
         <button type="submit" hidden>Search</button>
       </form>
 
+      <!-- Loading row now in normal flow under the form -->
+      <div id="loading" class="loading" aria-live="polite" aria-busy="false">
+        <div class="spinner" aria-hidden="true"></div>
+        <span>Loading results…</span>
+      </div>
+
       <p class="note">Tip: Try “Panthera leo”, “Monarch butterfly”, or “Ginkgo biloba”.</p>
     </section>
+
+    <section class="results-wrap">
+      <div id="results" aria-live="polite"></div>
+    </section>
   </main>
+
   <script>
-    async function sayHi() {
+    function setLoading(state) {
+      const el = document.getElementById("loading");
+      el.classList.toggle("show", state);
+      el.setAttribute("aria-busy", state ? "true" : "false");
+    }
+
+    async function runSearch(e) {
+      // Fix: prevent page navigation/reload on Enter
+      if (e && typeof e.preventDefault === "function") e.preventDefault();
+
       const query = document.querySelector(".search-input").value.trim();
-      if (!query) return false;
-      console.log("Getting data...")
+      if (!query) return;
+
+      setLoading(true);
+
       try {
         const res = await fetch(`http://localhost:8000/species?search=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        console.log(data);
+
+        const resultsContainer = document.getElementById("results");
+        resultsContainer.innerHTML = ""; // clear previous results
+
+        const items = Array.isArray(data.data) ? data.data : [];
+        if (!items.length) {
+          resultsContainer.innerHTML = `<div class="panel"><h4>No results</h4><div class="kv"><span class="label">Try another query.</span></div></div>`;
+          return;
+        }
+
+        items.forEach(animal => {
+          const panel = document.createElement("div");
+          panel.className = "panel";
+
+          const title = document.createElement("h4");
+          title.textContent = animal.vernacularName || animal.scientificName || "Unknown species";
+          panel.appendChild(title);
+
+          const info = document.createElement("div");
+          info.innerHTML = `
+            <div class="kv"><span class="label">Scientific:</span> ${animal.scientificName || "-"}</div>
+            <div class="kv"><span class="label">Kingdom:</span> ${animal.kingdom || "-"}</div>
+            <div class="kv"><span class="label">Habitats:</span> ${(animal.habitats || []).join(", ") || "-"}</div>
+            <div class="kv"><span class="label">Threat:</span> ${(animal.threatStatuses || []).join(", ") || "-"}</div>
+            <div class="kv"><span class="label">Extinct:</span> ${String(animal.extinct)}</div>
+          `;
+          panel.appendChild(info);
+
+          const imgs = Array.isArray(animal.images) ? animal.images.filter(Boolean) : [];
+          if (imgs.length) {
+            let idx = 0;
+
+            const carousel = document.createElement("div");
+            carousel.className = "carousel";
+
+            const img = document.createElement("img");
+            img.loading = "lazy";
+            img.src = imgs[idx];
+            img.alt = `${title.textContent} image ${idx + 1}`;
+            carousel.appendChild(img);
+
+            const counter = document.createElement("div");
+            counter.className = "counter";
+            counter.textContent = `${idx + 1}/${imgs.length}`;
+            carousel.appendChild(counter);
+
+            const prevBtn = document.createElement("button");
+            prevBtn.className = "nav-btn prev";
+            prevBtn.type = "button";
+            prevBtn.setAttribute("aria-label", "Previous image");
+            prevBtn.textContent = "‹";
+            prevBtn.addEventListener("click", () => {
+              idx = (idx - 1 + imgs.length) % imgs.length;
+              img.src = imgs[idx];
+              counter.textContent = `${idx + 1}/${imgs.length}`;
+            });
+
+            const nextBtn = document.createElement("button");
+            nextBtn.className = "nav-btn next";
+            nextBtn.type = "button";
+            nextBtn.setAttribute("aria-label", "Next image");
+            nextBtn.textContent = "›";
+            nextBtn.addEventListener("click", () => {
+              idx = (idx + 1) % imgs.length;
+              img.src = imgs[idx];
+              counter.textContent = `${idx + 1}/${imgs.length}`;
+            });
+
+            carousel.appendChild(prevBtn);
+            carousel.appendChild(nextBtn);
+            panel.appendChild(carousel);
+          }
+
+          resultsContainer.appendChild(panel);
+        });
       } catch (err) {
         console.error("Fetch error:", err);
+        const resultsContainer = document.getElementById("results");
+        resultsContainer.innerHTML = `<div class="panel"><h4>Error</h4><div class="kv"><span class="label">Details:</span> ${err.message}</div></div>`;
+      } finally {
+        setLoading(false);
       }
-
-      return false; // prevents form submission
     }
   </script>
 </body>
